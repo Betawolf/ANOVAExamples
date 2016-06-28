@@ -69,7 +69,7 @@ display3D <- function(data_matrix, alabel="Factor A", blabel="Factor B",
 
 # Return a string showing a sum of squared differences between a vector of values and a single comparison.
 printsquareddiff <- function(vals, mean){
-    return(paste("(", paste(sapply(vals, function(v){ return(paste("(", v, " - ", mean, ")^2", sep="")) }),collapse=" + "), ")"))
+    return(paste("(", paste(sapply(vals, function(v){ return(paste("(", round(v,2), " - ", round(mean,2), ")^2", sep="")) }),collapse=" + "), ")"))
 }
 
 # Returns a string showing a particular complex sum.
@@ -79,7 +79,7 @@ printsquaredmultidiff <- function(cel_means, row_means, col_means, sample_mean, 
   for (i in 1:length(row_means)){
     for (j in 1:length(col_means)){
       k <- k + 1
-      terms <- c(terms, paste("(", cel_means[i,j], " - ", row_means[i], " - ", col_means[i], " + ", sample_mean, ")^2", ifelse(k %% 3 == 0, "\\] \n \\[", ""), sep=""))
+      terms <- c(terms, paste("(", round(cel_means[i,j],2), " - ", round(row_means[i],2), " - ", round(col_means[j],2), " + ", round(sample_mean,2), ")^2", ifelse(k %% 3 == 0, "\\] \n \\[", ""), sep=""))
     }
   }
   termstring <- paste(r, "[", paste(terms, collapse=" + "), "]", sep="")
@@ -158,25 +158,25 @@ workedanova <- function(data, alabel="Factor A", blabel="Factor B",
   display3D(data3d(a,b,r, data=ssts2))
 
   cat("\n \\[ \\mbox{SSTotal} = \\sum_{i=1}^a\\sum_{j=1}^b\\sum_{k=1}^r(y_{ijk} -
-  \\bar{y}_{...})^2 = ", SStot, "\\] \n")
+  \\bar{y}_{...})^2 = ", round(SStot,2), "\\] \n")
 
   cat("\n \\[ \\mbox{SSA} = br\\sum_{i=1}^a(\\bar{y}_{i..} - \\bar{y}_{...})^2
-  = ", b, "\\times", r, printsquareddiff(row_means, sample_mean), " = ", b*r, "\\times", sum((row_means - sample_mean) ^ 2), " = ", SSA, "\\] \n")
+  = ", b, "\\times", r, printsquareddiff(row_means, sample_mean), "\\] \n \\[ = ", b*r, "\\times", round(sum((row_means - sample_mean) ^ 2),2), "\\] \n \\[ = ", round(SSA,2), "\\] \n")
       
   cat("\n \\[ \\mbox{SSB} = ar\\sum_{j=1}^b(\\bar{y}_{.j.} - \\bar{y}_{...})^2
-  = ", a, "\\times", r, printsquareddiff(col_means, sample_mean), " = ", a*r, "\\times", sum((col_means - sample_mean) ^ 2), " = ", SSB, "\\] \n")
+  = ", a, "\\times", r, printsquareddiff(col_means, sample_mean), "\\] \n \\[ = ", a*r, "\\times", round(sum((col_means - sample_mean) ^ 2),2), "\\] \n \\[ = ", round(SSB,2), "\\] \n")
 
 
   cat("\n \\[ \\mbox{SSAB} = r\\sum_{i=1}^a\\sum_{j=1}^b(\\bar{y}_{ij.} - \\bar{y}_{i..} - \\bar{y}_{.j.} \\bar{y}_{...})^2 = \\] \n \\[")
   cat(printsquaredmultidiff(cel_means, row_means, col_means, sample_mean, r))
-  cat(paste("\\[ = ",r, "[", paste((SSABs^2), collapse=" + "),"] \\] \n", sep=""), "\\[ =", SSAB, "\\] \n")
+  cat(paste("\\[ = ",r, "[", paste(round((SSABs^2),2), collapse=" + "),"] \\] \n", sep=""), "\\[ =", round(SSAB,2), "\\] \n")
    
   cat("\\\\ \nParameter estimates are: \\\\ \n")
-  cat("$ \\hat{\\mu } = \\bar{y}_{...} = ", sample_mean, "$ \\\\ \n")
+  cat("$ \\hat{\\mu } = \\bar{y}_{...} = ", round(sample_mean, 2), "$ \\\\ \n")
 
-  cat("$ \\hat{\\alpha_{i} } = \\bar{y}_{i..} = ", paste(sapply(row_means, function(i) { paste(i, " - ", sample_mean) }), collapse=","), " = ", paste(row_means - sample_mean, collapse=","), "$ \\\\ \n")
-  cat("$ \\hat{\\beta_{i} } = \\bar{y}_{i..} = ", paste(sapply(col_means, function(i) { paste(i, " - ", sample_mean) }), collapse=","), " = ", paste(col_means - sample_mean, collapse=","), "$ \\\\ \n")
-  cat("$ \\hat{\\alpha\\beta_{ij}} = \\bar{y}_{ij.} - \\bar{y}_{i..} - \\bar{y}_{.j.} \\bar{y}_{...} =", paste(SSABs, collapse=","), "$ \\\\ \n")
+  cat("$ \\hat{\\alpha_{i} } = \\bar{y}_{i..} = ", paste(sapply(row_means, function(i) { paste(round(i,2), " - ", round(sample_mean,2)) }), collapse=","), " = ", paste(round(row_means - sample_mean,2), collapse=","), "$ \\\\ \n")
+  cat("$ \\hat{\\beta_{i} } = \\bar{y}_{i..} = ", paste(sapply(col_means, function(i) { paste(round(i,2), " - ", round(sample_mean,2)) }), collapse=","), " = ", paste(round(col_means - sample_mean,2), collapse=","), "$ \\\\ \n")
+  cat("$ \\hat{\\alpha\\beta_{ij}} = \\bar{y}_{ij.} - \\bar{y}_{i..} - \\bar{y}_{.j.} \\bar{y}_{...} =", paste(round(SSABs,2), collapse=","), "$ \\\\ \n")
 
   sources <- c("A","B", "A x B", "Error", "Total")
   degrees <- c(a-1, b-1, ((a-1)*(b-1)), length(unlist(data)) - (a*b), sum(a-1,b-1,((a-1)*(b-1)), length(unlist(data)) - (a*b)))
